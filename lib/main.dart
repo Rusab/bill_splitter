@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 const _primaryColor = Color(0xFF505050);
 const _accentColor = Color(0xFF8CD95F);
 const _deleteColor = Color(0xFFF97373);
+
+const List<Color> _userColor = [
+  Color(0xFF89B5AF),
+  Color(0xFF9E7777),
+  Color(0xFF96C7C1),
+  Color(0xFFD0CAB2),
+  Color(0xFFFFC898),
+  Color(0xFFC37B89),
+  Color(0xFFBCCC9A),
+  Color(0xFF316B83),
+  Color(0xFF6D8299),
+  Color(0xFF8CA1A5),
+];
+
+final _random = new Random();
+int randnext(int max) => _random.nextInt(max);
 
 void main() {
   runApp(MaterialApp(
@@ -10,17 +27,18 @@ void main() {
   ));
 }
 
-class UserEntry extends StatefulWidget {
+// User Data class to use in UserEntry
+class UserData {
   String name;
   double bill;
   double difference;
+  UserData({required this.name, required this.bill, required this.difference});
+}
+
+class UserEntry extends StatefulWidget {
+  UserData user;
   final VoidCallback deleteUser;
-  UserEntry(
-      {Key? key,
-      required this.name,
-      required this.bill,
-      required this.difference,
-      required this.deleteUser})
+  UserEntry({Key? key, required this.user, required this.deleteUser})
       : super(key: key);
 
   @override
@@ -54,7 +72,7 @@ class _UserEntryState extends State<UserEntry> {
                     Container(
                       width: 60,
                       height: 60,
-                      child: Text('A',
+                      child: Text(widget.user.name[0],
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -62,7 +80,7 @@ class _UserEntryState extends State<UserEntry> {
                           )),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.amber,
+                        color: _userColor[randnext(_userColor.length - 1)],
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -72,11 +90,12 @@ class _UserEntryState extends State<UserEntry> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Abdul Karim',
+                            widget.user.name,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 17),
                           ),
-                          Text('BDT 180.0', style: TextStyle(fontSize: 20)),
+                          Text('BDT ' + widget.user.bill.toString(),
+                              style: TextStyle(fontSize: 20)),
                         ],
                       ),
                     ),
@@ -84,7 +103,8 @@ class _UserEntryState extends State<UserEntry> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.arrow_upward),
-                        Text('20.0', style: TextStyle(fontSize: 20))
+                        Text(widget.user.difference.toString(),
+                            style: TextStyle(fontSize: 20))
                       ],
                     ),
                   ],
@@ -201,6 +221,12 @@ class newUserDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController usernameController = new TextEditingController();
+
+    void setName(TextEditingController username_cont) {
+      Navigator.pop(context, username_cont.text);
+    }
+
     return InputPrompt(
       title: 'Add New User',
       child: Column(
@@ -208,6 +234,7 @@ class newUserDialog extends StatelessWidget {
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
+              controller: usernameController,
               decoration: InputDecoration(
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
@@ -217,7 +244,7 @@ class newUserDialog extends StatelessWidget {
           )
         ],
       ),
-      confirmFunction: () {},
+      confirmFunction: () => setName(usernameController),
     );
   }
 }
@@ -231,7 +258,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _userListState extends State<HomeScreen> {
-  final List<Widget> _userList = [];
+  final List<UserData> _userList = [];
   final GlobalKey<AnimatedListState> _key = GlobalKey();
 
   @override
@@ -270,18 +297,21 @@ class _userListState extends State<HomeScreen> {
 
       _userList.insert(
           0,
-          UserEntry(
-            name: 'Rusab',
-            bill: 240.0,
-            difference: 20.0,
-            deleteUser: () => _removeUser(index, context),
+          UserData(
+            name: user_name,
+            bill: 0.0,
+            difference: 0.0,
           ));
       _key.currentState!.insertItem(0, duration: Duration(milliseconds: 200));
     }
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('Bill Splitter'),
+          title: Text(
+            'Bill Splitter',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: _primaryColor,
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -297,9 +327,7 @@ class _userListState extends State<HomeScreen> {
                       key: UniqueKey(),
                       sizeFactor: animation,
                       child: UserEntry(
-                          name: 'Rusab',
-                          bill: 240.0,
-                          difference: 20.0,
+                          user: _userList[index],
                           deleteUser: () => _removeUser(index, context)));
                 },
               ),
