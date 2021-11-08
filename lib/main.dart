@@ -102,7 +102,7 @@ class _UserEntryState extends State<UserEntry> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.arrow_upward),
+                        Icon(Icons.arrow_circle_up_rounded),
                         Text(widget.user.difference.toString(),
                             style: TextStyle(fontSize: 20))
                       ],
@@ -119,8 +119,8 @@ class _UserEntryState extends State<UserEntry> {
                 },
                 onLongPress: () {
                   setState(() {
-                    _crossHeight = 20.0;
-                    _crossWidth = 20.0;
+                    _crossHeight = 25.0;
+                    _crossWidth = 25.0;
                   });
                 },
               ),
@@ -140,7 +140,7 @@ class _UserEntryState extends State<UserEntry> {
         ),
       ),
       Padding(
-        padding: const EdgeInsets.only(top: 10, right: 10),
+        padding: const EdgeInsets.only(top: 15, right: 15),
         child: Align(
           alignment: Alignment.topRight,
           //close button popup
@@ -149,7 +149,13 @@ class _UserEntryState extends State<UserEntry> {
             width: _crossWidth,
             duration: const Duration(milliseconds: 100),
             curve: Curves.bounceInOut,
-            child: GestureDetector(onTap: widget.deleteUser),
+            child: Stack(alignment: Alignment.center, children: [
+              Icon(
+                Icons.close_rounded,
+                color: Colors.white,
+              ),
+              GestureDetector(onTap: widget.deleteUser),
+            ]),
             decoration: new BoxDecoration(
               color: _deleteColor,
               shape: BoxShape.circle,
@@ -307,9 +313,11 @@ class _userListState extends State<HomeScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Bill Splitter',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Center(
+            child: Text(
+              'Bill Splitter',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           backgroundColor: _primaryColor,
         ),
