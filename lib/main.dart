@@ -18,7 +18,7 @@ const List<Color> _userColor = [
   Color(0xFF8CA1A5),
 ];
 
-final _random = new Random();
+final _random = Random();
 int randnext(int max) => _random.nextInt(max);
 
 void main() {
@@ -32,7 +32,12 @@ class UserData {
   String name;
   double bill;
   double difference;
-  UserData({required this.name, required this.bill, required this.difference});
+  int random_num;
+  UserData(
+      {required this.name,
+      required this.bill,
+      required this.difference,
+      required this.random_num});
 }
 
 class UserEntry extends StatefulWidget {
@@ -80,7 +85,7 @@ class _UserEntryState extends State<UserEntry> {
                           )),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: _userColor[randnext(_userColor.length - 1)],
+                        color: _userColor[widget.user.random_num],
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -270,6 +275,7 @@ class _userListState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     void _removeUser(int index, context) {
+      _userList.removeAt(index);
       _key.currentState!.removeItem(index, (context, animation) {
         return SizeTransition(
           sizeFactor: animation,
@@ -294,21 +300,30 @@ class _userListState extends State<HomeScreen> {
     }
 
     void _addUser(int index, context) async {
-      var user_name = await showDialog(
+      var nameInput = await showDialog(
           context: context,
           builder: (BuildContext context) {
             return Dialog(
                 backgroundColor: Colors.transparent, child: newUserDialog());
           });
 
-      _userList.insert(
-          0,
-          UserData(
-            name: user_name,
-            bill: 0.0,
-            difference: 0.0,
-          ));
-      _key.currentState!.insertItem(0, duration: Duration(milliseconds: 200));
+      //check if null
+      if (nameInput != null) {
+        String user_name = nameInput.toString();
+        //only add to list if the string contains letters
+        if (user_name.contains(new RegExp(r'[a-z]|[A-Z]'))) {
+          _userList.insert(
+              0,
+              UserData(
+                name: user_name,
+                bill: 0.0,
+                difference: 0.0,
+                random_num: randnext(_userColor.length - 1),
+              ));
+          _key.currentState!
+              .insertItem(0, duration: Duration(milliseconds: 200));
+        }
+      }
     }
 
     return Scaffold(
