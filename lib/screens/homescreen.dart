@@ -22,10 +22,6 @@ class _UserEntryState extends State<UserEntry> {
   @override
   Widget build(BuildContext context) {
     int index = _userListState()._userList.length;
-    void nextScreen(context) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ItemScreen()));
-    }
 
     return Stack(children: [
       //main user entry
@@ -34,7 +30,7 @@ class _UserEntryState extends State<UserEntry> {
         child: Container(
           height: _height,
           width: (MediaQuery.of(context).size.width - 30),
-          margin: const EdgeInsets.all(10.0),
+          margin: const EdgeInsets.all(6.0),
           child: Stack(
             children: [
               Padding(
@@ -136,13 +132,6 @@ class _UserEntryState extends State<UserEntry> {
           ),
         ),
       ),
-      SizedBox(
-          height: 600,
-          width: 600,
-          child: GestureDetector(
-            onHorizontalDragEnd: (DragEndDetails details) =>
-                nextScreen(context),
-          )),
     ]);
   }
 }
@@ -195,6 +184,11 @@ class _userListState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    void nextScreen(context) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ItemScreen()));
+    }
+
     void _removeUser(int index, context) {
       _userList.removeAt(index);
       _key.currentState!.removeItem(index, (context, animation) {
@@ -257,43 +251,55 @@ class _userListState extends State<HomeScreen> {
           ),
           backgroundColor: primaryColor,
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        body: Stack(
           children: [
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AnimatedList(
-                key: _key,
-                initialItemCount: 0,
-                itemBuilder: (context, index, animation) {
-                  return SizeTransition(
-                      key: UniqueKey(),
-                      sizeFactor: animation,
-                      child: UserEntry(
-                          user: _userList[index],
-                          deleteUser: () => _removeUser(index, context)));
-                },
-              ),
-            )),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FloatingActionButton.extended(
-                      onPressed: () {},
-                      heroTag: 'transactions',
-                      backgroundColor: primaryColor,
-                      label: Text('Transactions')),
-                  FloatingActionButton(
-                      onPressed: () => _addUser(0, context),
-                      heroTag: 'user',
-                      backgroundColor: primaryColor,
-                      child: Icon(Icons.add, color: accentColor))
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AnimatedList(
+                    key: _key,
+                    initialItemCount: 0,
+                    itemBuilder: (context, index, animation) {
+                      return SizeTransition(
+                          key: UniqueKey(),
+                          sizeFactor: animation,
+                          child: UserEntry(
+                              user: _userList[index],
+                              deleteUser: () => _removeUser(index, context)));
+                    },
+                  ),
+                )),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FloatingActionButton.extended(
+                          onPressed: () {},
+                          heroTag: 'transactions',
+                          backgroundColor: primaryColor,
+                          label: Text('Transactions')),
+                      FloatingActionButton(
+                          onPressed: () => _addUser(0, context),
+                          heroTag: 'user',
+                          backgroundColor: primaryColor,
+                          child: Icon(Icons.add, color: accentColor))
+                    ],
+                  ),
+                ),
+              ],
             ),
+            SizedBox(
+                height: 600,
+                width: 600,
+                child: GestureDetector(
+                  onHorizontalDragEnd: (DragEndDetails details) =>
+                      nextScreen(context),
+                )),
           ],
         ));
   }
