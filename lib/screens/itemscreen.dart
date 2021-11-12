@@ -1,6 +1,8 @@
 import 'package:bill_splitter/main.dart';
+import 'package:bill_splitter/models/lists.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_splitter/colors.dart';
+import 'package:provider/provider.dart';
 
 class ItemEntry extends StatefulWidget {
   ItemData item;
@@ -122,14 +124,16 @@ class newItemDialog extends StatelessWidget {
 
     return InputPrompt(
       title: 'Add New item',
-      height: 350,
+      height: 600,
       child: Column(
         children: [
           Container(
             margin: EdgeInsets.all(10),
             child: TextField(
               controller: itemnameController,
+              cursorColor: accentColor,
               decoration: InputDecoration(
+                focusColor: accentColor,
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
                 labelText: 'Item Name',
@@ -141,11 +145,23 @@ class newItemDialog extends StatelessWidget {
             child: TextField(
               controller: itemPriceController,
               decoration: InputDecoration(
+                focusColor: accentColor,
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
                 labelText: 'Price',
               ),
             ),
+          ),
+          Container(
+            height: 200,
+            child: Consumer<UserList>(
+                builder: (BuildContext context, UserList list, Widget? child) {
+              return ListView.builder(
+                  itemCount: list.userList.length,
+                  itemBuilder: (context, index) {
+                    return Center(child: Text(list.userList[index].name));
+                  });
+            }),
           )
         ],
       ),

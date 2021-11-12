@@ -3,6 +3,7 @@ import 'package:bill_splitter/models/lists.dart';
 import 'package:bill_splitter/screens/itemscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_splitter/colors.dart';
+import 'package:provider/provider.dart';
 
 class UserEntry extends StatefulWidget {
   UserData user;
@@ -158,6 +159,7 @@ class newUserDialog extends StatelessWidget {
             child: TextField(
               controller: usernameController,
               decoration: InputDecoration(
+                focusColor: accentColor,
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
                 labelText: 'User Name',
@@ -253,13 +255,10 @@ class _userListState extends State<UserListScreen>
 
   @override
   Widget build(BuildContext context) {
-    void nextScreen(context) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ItemScreen()));
-    }
+    UserList list = Provider.of<UserList>(context);
 
     void _removeUser(int index, context) {
-      _userList.removeAt(index);
+      list.userList.removeAt(index);
       _key.currentState!.removeItem(index, (context, animation) {
         return SizeTransition(
           sizeFactor: animation,
@@ -296,14 +295,15 @@ class _userListState extends State<UserListScreen>
         String user_name = nameInput.toString();
         //only add to list if the string contains letters
         if (user_name.contains(new RegExp(r'[a-z]|[A-Z]'))) {
-          _userList.insert(
-              0,
-              UserData(
-                name: user_name,
-                bill: 0.0,
-                difference: 0.0,
-                random_num: randnext(userColor.length - 1),
-              ));
+          list.userList
+            ..insert(
+                0,
+                UserData(
+                  name: user_name,
+                  bill: 0.0,
+                  difference: 0.0,
+                  random_num: randnext(userColor.length - 1),
+                ));
           _key.currentState!
               .insertItem(0, duration: Duration(milliseconds: 200));
         }
@@ -316,22 +316,26 @@ class _userListState extends State<UserListScreen>
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AnimatedList(
-                key: _key,
-                initialItemCount: 0,
-                itemBuilder: (context, index, animation) {
-                  return SizeTransition(
-                      key: UniqueKey(),
-                      sizeFactor: animation,
-                      child: UserEntry(
-                          user: _userList[index],
-                          deleteUser: () => _removeUser(index, context)));
-                },
-              ),
-            )),
+            Consumer<UserList>(
+              builder: (BuildContext context, UserList list, Widget? child) {
+                return Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AnimatedList(
+                    key: _key,
+                    initialItemCount: 0,
+                    itemBuilder: (context, index, animation) {
+                      return SizeTransition(
+                          key: UniqueKey(),
+                          sizeFactor: animation,
+                          child: UserEntry(
+                              user: list.userList[index],
+                              deleteUser: () => _removeUser(index, context)));
+                    },
+                  ),
+                ));
+              },
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
               child: Row(

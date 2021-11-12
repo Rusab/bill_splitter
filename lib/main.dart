@@ -1,14 +1,19 @@
+import 'package:bill_splitter/models/lists.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_splitter/screens/homescreen.dart';
 import 'dart:math';
 import 'package:bill_splitter/colors.dart';
+import 'package:provider/provider.dart';
 
 final _random = Random();
 int randnext(int max) => _random.nextInt(max);
 
 void main() {
-  runApp(MaterialApp(
-    home: const HomeScreen(),
+  runApp(ChangeNotifierProvider(
+    create: (context) => UserList(),
+    child: MaterialApp(
+      home: const HomeScreen(),
+    ),
   ));
 }
 
