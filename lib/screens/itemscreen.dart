@@ -12,7 +12,8 @@ class ItemEntry extends StatefulWidget {
   State<ItemEntry> createState() => _ItemEntryState();
 }
 
-class _ItemEntryState extends State<ItemEntry> {
+class _ItemEntryState extends State<ItemEntry>
+    with AutomaticKeepAliveClientMixin {
   final double _height = 80;
 
   double _crossHeight = 0;
@@ -28,7 +29,7 @@ class _ItemEntryState extends State<ItemEntry> {
         child: Container(
           height: _height,
           width: (MediaQuery.of(context).size.width - 30),
-          margin: const EdgeInsets.all(10.0),
+          margin: const EdgeInsets.all(4.0),
           child: Stack(
             children: [
               Padding(
@@ -103,6 +104,8 @@ class _ItemEntryState extends State<ItemEntry> {
       )
     ]);
   }
+
+  bool get wantKeepAlive => true;
 }
 
 class newItemDialog extends StatelessWidget {
@@ -159,7 +162,8 @@ class ItemScreen extends StatefulWidget {
   State<ItemScreen> createState() => _itemListState();
 }
 
-class _itemListState extends State<ItemScreen> {
+class _itemListState extends State<ItemScreen>
+    with AutomaticKeepAliveClientMixin {
   final List<ItemData> __itemDataList = [];
   final GlobalKey<AnimatedListState> _key = GlobalKey();
 
@@ -222,61 +226,45 @@ class _itemListState extends State<ItemScreen> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Center(
-            child: Text(
-              'Item List',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          backgroundColor: primaryColor,
-        ),
         body: Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnimatedList(
-                    key: _key,
-                    itemBuilder: (context, index, animation) {
-                      return SizeTransition(
-                          key: UniqueKey(),
-                          sizeFactor: animation,
-                          child: ItemEntry(
-                              item: __itemDataList[index],
-                              deleteItem: () =>
-                                  _remove_itemData(index, context)));
-                    },
-                  ),
-                )),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      FloatingActionButton(
-                          onPressed: () => _additem(0, context),
-                          backgroundColor: primaryColor,
-                          heroTag: 'item',
-                          child: Icon(Icons.add, color: accentColor))
-                    ],
-                  ),
-                ),
-              ],
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedList(
+                key: _key,
+                itemBuilder: (context, index, animation) {
+                  return SizeTransition(
+                      key: UniqueKey(),
+                      sizeFactor: animation,
+                      child: ItemEntry(
+                          item: __itemDataList[index],
+                          deleteItem: () => _remove_itemData(index, context)));
+                },
+              ),
+            )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FloatingActionButton(
+                      onPressed: () => _additem(0, context),
+                      backgroundColor: primaryColor,
+                      heroTag: 'item',
+                      child: Icon(Icons.add, color: accentColor))
+                ],
+              ),
             ),
-            SizedBox(
-                height: 600,
-                width: 600,
-                child: GestureDetector(
-                  onHorizontalDragEnd: (DragEndDetails details) =>
-                      lastScreen(context),
-                ))
           ],
-        ));
+        ),
+      ],
+    ));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

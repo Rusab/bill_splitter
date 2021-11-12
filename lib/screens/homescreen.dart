@@ -1,4 +1,5 @@
 import 'package:bill_splitter/main.dart';
+import 'package:bill_splitter/models/lists.dart';
 import 'package:bill_splitter/screens/itemscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_splitter/colors.dart';
@@ -171,14 +172,82 @@ class newUserDialog extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  int current_page_index = 0;
+  String title = 'Bill Splitter';
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(vsync: this, length: 2);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        backgroundColor: primaryColor,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: accentColor,
+          unselectedLabelColor: Colors.white,
+          labelColor: accentColor,
+          tabs: [
+            Tab(icon: Icon(Icons.person)),
+            Tab(icon: Icon(Icons.food_bank)),
+          ],
+          onTap: (newIndex) {
+            _tabController.animateTo(newIndex,
+                duration: Duration(milliseconds: 100), curve: Curves.ease);
+          },
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        /* onTabChange: (index) {
+          setState(() {
+            current_page_index = index;
+            switch (current_page_index) {
+              case 0:
+                title = "Bill Splitter";
+                break;
+              case 1:
+                title = "Item List";
+                break;
+            }
+          });
+        },*/
+        children: <Widget>[UserListScreen(), ItemScreen()],
+        physics: BouncingScrollPhysics(),
+      ),
+    );
+  }
+}
+
+class UserListScreen extends StatefulWidget {
+  const UserListScreen({
     Key? key,
   }) : super(key: key);
   @override
-  State<HomeScreen> createState() => _userListState();
+  State<UserListScreen> createState() => _userListState();
 }
 
-class _userListState extends State<HomeScreen> {
+class _userListState extends State<UserListScreen>
+    with AutomaticKeepAliveClientMixin {
   final List<UserData> _userList = [];
   final GlobalKey<AnimatedListState> _key = GlobalKey();
 
@@ -241,66 +310,52 @@ class _userListState extends State<HomeScreen> {
       }
     }
 
-    return Scaffold(
-        appBar: AppBar(
-          title: Center(
-            child: Text(
-              'Bill Splitter',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          backgroundColor: primaryColor,
-        ),
-        body: Stack(
+    return Container(
+      color: Colors.white,
+      child: Stack(children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnimatedList(
-                    key: _key,
-                    initialItemCount: 0,
-                    itemBuilder: (context, index, animation) {
-                      return SizeTransition(
-                          key: UniqueKey(),
-                          sizeFactor: animation,
-                          child: UserEntry(
-                              user: _userList[index],
-                              deleteUser: () => _removeUser(index, context)));
-                    },
-                  ),
-                )),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      FloatingActionButton.extended(
-                          onPressed: () {},
-                          heroTag: 'transactions',
-                          backgroundColor: primaryColor,
-                          label: Text('Transactions')),
-                      FloatingActionButton(
-                          onPressed: () => _addUser(0, context),
-                          heroTag: 'user',
-                          backgroundColor: primaryColor,
-                          child: Icon(Icons.add, color: accentColor))
-                    ],
-                  ),
-                ),
-              ],
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedList(
+                key: _key,
+                initialItemCount: 0,
+                itemBuilder: (context, index, animation) {
+                  return SizeTransition(
+                      key: UniqueKey(),
+                      sizeFactor: animation,
+                      child: UserEntry(
+                          user: _userList[index],
+                          deleteUser: () => _removeUser(index, context)));
+                },
+              ),
+            )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  FloatingActionButton.extended(
+                      onPressed: () {},
+                      heroTag: 'transactions',
+                      backgroundColor: primaryColor,
+                      label: Text('Transactions')),
+                  FloatingActionButton(
+                      onPressed: () => _addUser(0, context),
+                      heroTag: 'user',
+                      backgroundColor: primaryColor,
+                      child: Icon(Icons.add, color: accentColor))
+                ],
+              ),
             ),
-            SizedBox(
-                height: 600,
-                width: 600,
-                child: GestureDetector(
-                  onHorizontalDragEnd: (DragEndDetails details) =>
-                      nextScreen(context),
-                )),
           ],
-        ));
+        ),
+      ]),
+    );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
