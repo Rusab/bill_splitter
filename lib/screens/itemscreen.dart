@@ -110,6 +110,55 @@ class _ItemEntryState extends State<ItemEntry>
   bool get wantKeepAlive => true;
 }
 
+class newContributerDialog extends StatefulWidget {
+  const newContributerDialog({Key? key}) : super(key: key);
+
+  @override
+  _newContributerDialogState createState() => _newContributerDialogState();
+}
+
+class _newContributerDialogState extends State<newContributerDialog> {
+  @override
+  Widget build(BuildContext context) {
+    void setContributer(List<UserData> selectlist) {}
+
+    return InputPrompt(
+      title: 'Add New Contributer',
+      height: 400,
+      child: Consumer<UserList>(
+          builder: (BuildContext context, UserList list, Widget? child) {
+        return ListView.builder(
+            itemCount: list.userList.length,
+            itemBuilder: (context, index) {
+              return Center(
+                  child: Container(
+                child: Center(
+                    child: Text(
+                  list.userList[index].name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                )),
+                height: 30,
+                margin: EdgeInsets.all(10.0),
+                width: (MediaQuery.of(context).size.width - 2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 6,
+                        offset: Offset(0, 0))
+                  ],
+                ),
+              ));
+            });
+      }),
+      confirmFunction: () {},
+    );
+  }
+}
+
 class newItemDialog extends StatelessWidget {
   const newItemDialog({Key? key}) : super(key: key);
 
@@ -131,7 +180,6 @@ class newItemDialog extends StatelessWidget {
             margin: EdgeInsets.all(10),
             child: TextField(
               controller: itemnameController,
-              cursorColor: accentColor,
               decoration: InputDecoration(
                 focusColor: accentColor,
                 border:
@@ -159,7 +207,29 @@ class newItemDialog extends StatelessWidget {
               return ListView.builder(
                   itemCount: list.userList.length,
                   itemBuilder: (context, index) {
-                    return Center(child: Text(list.userList[index].name));
+                    return Center(
+                        child: Container(
+                      child: Center(
+                          child: Text(
+                        list.userList[index].name,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      )),
+                      height: 30,
+                      margin: EdgeInsets.all(10.0),
+                      width: (MediaQuery.of(context).size.width - 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 6,
+                              offset: Offset(0, 0))
+                        ],
+                      ),
+                    ));
                   });
             }),
           )
