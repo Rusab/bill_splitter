@@ -84,7 +84,7 @@ class _ItemEntryState extends State<ItemEntry>
         padding: const EdgeInsets.only(top: 15, right: 15),
         child: Align(
           alignment: Alignment.topRight,
-          //close button popup
+          //tick button popup
           child: AnimatedContainer(
             height: _crossHeight,
             width: _crossWidth,
@@ -110,51 +110,101 @@ class _ItemEntryState extends State<ItemEntry>
   bool get wantKeepAlive => true;
 }
 
-class newContributerDialog extends StatefulWidget {
-  const newContributerDialog({Key? key}) : super(key: key);
+class newContributorDialog extends StatefulWidget {
+  const newContributorDialog({Key? key}) : super(key: key);
 
   @override
-  _newContributerDialogState createState() => _newContributerDialogState();
+  _newContributorDialogState createState() => _newContributorDialogState();
 }
 
-class _newContributerDialogState extends State<newContributerDialog> {
+class _newContributorDialogState extends State<newContributorDialog> {
   @override
   Widget build(BuildContext context) {
-    void setContributer(List<UserData> selectlist) {}
+    List<UserData> selectedContributors = [];
+    double _tickHeight = 0.0;
+    double _tickWidth = 0.0;
+
+    void setContributer(List<UserData> selectlist) {
+      Navigator.pop(context, selectlist);
+    }
 
     return InputPrompt(
       title: 'Add New Contributer',
-      height: 400,
+      height: 300,
       child: Consumer<UserList>(
           builder: (BuildContext context, UserList list, Widget? child) {
         return ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
             itemCount: list.userList.length,
             itemBuilder: (context, index) {
               return Center(
-                  child: Container(
-                child: Center(
-                    child: Text(
-                  list.userList[index].name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                )),
-                height: 30,
-                margin: EdgeInsets.all(10.0),
-                width: (MediaQuery.of(context).size.width - 2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 6,
-                        offset: Offset(0, 0))
-                  ],
-                ),
+                  child: Stack(
+                children: [
+                  Container(
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Text(
+                            list.userList[index].name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ),
+                        GestureDetector(
+                            onTap: () => () {
+                                  setState(() {
+                                    _tickWidth = 25.0;
+                                    _tickHeight = 25.0;
+                                    selectedContributors
+                                        .add(list.userList[index]);
+                                  });
+                                }),
+                      ],
+                    ),
+                    height: 30,
+                    margin: EdgeInsets.all(10.0),
+                    width: (MediaQuery.of(context).size.width - 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 6,
+                            offset: Offset(0, 0))
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15, right: 15),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      //close button popup
+                      child: AnimatedContainer(
+                        height: _tickHeight,
+                        width: _tickWidth,
+                        duration: const Duration(milliseconds: 100),
+                        curve: Curves.bounceInOut,
+                        child: Stack(alignment: Alignment.center, children: [
+                          Icon(
+                            Icons.close_rounded,
+                            color: Colors.white,
+                          ),
+                        ]),
+                        decoration: new BoxDecoration(
+                          color: deleteColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ));
             });
       }),
-      confirmFunction: () {},
+      confirmFunction: () => setContributer(selectedContributors),
     );
   }
 }
@@ -166,14 +216,32 @@ class newItemDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController itemnameController = new TextEditingController();
     TextEditingController itemPriceController = new TextEditingController();
+    List<UserData> final_contributorList = [];
 
     void setValue(TextEditingController name, TextEditingController price) {
       Navigator.pop(context, [name.text, price.text]);
     }
 
+    void _addContributor(context) async {
+      List<UserData> selectedContributors = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+                backgroundColor: Colors.transparent,
+                child: newContributorDialog());
+          });
+
+      //check if null
+      if (selectedContributors != null) {
+        //only add to list if the string contains letters
+
+        final_contributorList = selectedContributors;
+      }
+    }
+
     return InputPrompt(
       title: 'Add New item',
-      height: 600,
+      height: 500,
       child: Column(
         children: [
           Container(
@@ -200,39 +268,46 @@ class newItemDialog extends StatelessWidget {
               ),
             ),
           ),
+          Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text('Contributors: ',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
           Container(
-            height: 200,
-            child: Consumer<UserList>(
-                builder: (BuildContext context, UserList list, Widget? child) {
-              return ListView.builder(
-                  itemCount: list.userList.length,
-                  itemBuilder: (context, index) {
-                    return Center(
-                        child: Container(
-                      child: Center(
-                          child: Text(
-                        list.userList[index].name,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14),
-                      )),
-                      height: 30,
-                      margin: EdgeInsets.all(10.0),
-                      width: (MediaQuery.of(context).size.width - 2),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 6,
-                              offset: Offset(0, 0))
-                        ],
-                      ),
-                    ));
-                  });
-            }),
-          )
+            width: 190,
+            decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.all(Radius.circular(30))),
+            child: Column(
+              children: [
+                Center(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white,
+                    ),
+                    onPressed: () => _addContributor(context),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: Icon(Icons.add_circle_outline_sharp),
+                        ),
+                        Text('Add New Contributor'),
+                      ],
+                    ),
+                  ),
+                ),
+                ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: final_contributorList.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        child: Text(final_contributorList[index].name),
+                      );
+                    })
+              ],
+            ),
+          ),
         ],
       ),
       confirmFunction: () => setValue(itemnameController, itemPriceController),
