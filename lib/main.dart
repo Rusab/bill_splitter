@@ -45,7 +45,7 @@ class ItemData {
       {required this.name, required this.price, required this.contribution});
 }
 
-class InputPrompt extends StatelessWidget {
+class InputPrompt extends StatefulWidget {
   final String title;
   final Widget child;
   final double height;
@@ -59,6 +59,11 @@ class InputPrompt extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<InputPrompt> createState() => _InputPromptState();
+}
+
+class _InputPromptState extends State<InputPrompt> {
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -66,17 +71,17 @@ class InputPrompt extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       width: (MediaQuery.of(context).size.width - 30),
-      height: height,
+      height: widget.height,
       padding: EdgeInsets.all(20),
       child: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Container(
-            child: Text(title,
+            child: Text(widget.title,
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           ),
           Container(
-            child: child,
+            child: widget.child,
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -92,7 +97,7 @@ class InputPrompt extends StatelessWidget {
               style: TextButton.styleFrom(
                 primary: Colors.white,
               ),
-              onPressed: confirmFunction,
+              onPressed: widget.confirmFunction,
               child: Text('Confirm'),
             ),
           )
